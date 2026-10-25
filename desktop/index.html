@@ -4,8 +4,78 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlashMark</title>
+    <style>
+      /* 首屏加载动画：在 Vue bundle 下载/执行前即渲染，消除 webview 启动白屏闪烁。
+         样式内联且自包含（不依赖 main.css），Vue 挂载后由 main.ts 淡出移除。 */
+      #app-loading {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: #ffffff;
+        color: #1f2328;
+        transition: opacity 0.35s ease;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Microsoft YaHei', sans-serif;
+      }
+      #app-loading.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #app-loading .spinner {
+        width: 44px;
+        height: 44px;
+        animation: fm-spin 0.9s linear infinite;
+        transform-origin: center;
+      }
+      #app-loading .spinner circle {
+        fill: none;
+        stroke: #2563eb;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 90 150;
+      }
+      @keyframes fm-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      #app-loading .brand {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      #app-loading .hint {
+        font-size: 12px;
+        color: #6b7280;
+      }
+      /* 跟随系统深色主题，避免深色用户看到突兀的亮色闪屏 */
+      @media (prefers-color-scheme: dark) {
+        #app-loading {
+          background: #1e1e1e;
+          color: #e6e6e6;
+        }
+        #app-loading .spinner circle {
+          stroke: #60a5fa;
+        }
+        #app-loading .hint {
+          color: #9ca3af;
+        }
+      }
+    </style>
   </head>
   <body>
+    <!-- 首屏加载动画（Vue 挂载后由 main.ts 移除） -->
+    <div id="app-loading" aria-hidden="true">
+      <svg class="spinner" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" />
+      </svg>
+      <div class="hint">正在加载…</div>
+    </div>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
