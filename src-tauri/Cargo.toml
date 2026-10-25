@@ -27,3 +27,11 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
 base64 = "0.22"
+
+# 体积优化：在保持功能的前提下尽量压小 release 产物
+[profile.release]
+opt-level = "z"        # 以体积优先（-Oz），编辑器类应用对极速不敏感
+codegen-units = 1      # 单代码生成单元，提升跨 crate 内联与压缩率
+lto = true             # 链接时优化，去除死代码、显著减小二进制
+panic = "abort"        # 去掉 unwinding 路径与栈展开表
+strip = true           # 去除符号表/调试信息
