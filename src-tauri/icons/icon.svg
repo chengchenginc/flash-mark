@@ -1,0 +1,35 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- FlashMark 应用图标：Flash（闪电正中斜穿）+ Mark（居中大号 M） -->
+  <defs>
+    <!-- 背景：indigo -> violet 对角渐变 -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="0.55" stop-color="#7C5CF6"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <!-- 顶部径向高光，增加立体感 -->
+    <radialGradient id="glow" cx="0.3" cy="0.18" r="0.9">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 闪电黄色渐变 -->
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FDE047"/>
+      <stop offset="1" stop-color="#FACC15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角方形底 -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="220" fill="url(#glow)"/>
+
+  <!-- 上部主体：Markdown 标志性 M（白色，缩小一号，居中偏上） -->
+  <path d="M342 506 V200 L512 387 L682 200 V506"
+        fill="none" stroke="#FFFFFF" stroke-width="82"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 底部：经典竖向闪电 ⚡（黄色渐变，加大，直立居中，托在 M 下方） -->
+  <path d="M536 517 L419 713 L473 713 L436 883 L605 690 L539 690 Z"
+        fill="url(#bolt)" stroke="#FFFFFF" stroke-width="12"
+        stroke-linejoin="round"/>
+</svg>

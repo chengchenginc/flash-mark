@@ -1,0 +1,22 @@
+# 依赖
+node_modules/
+desktop/node_modules/
+
+# 构建产物
+desktop/dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# IDE
+.idea/
+.vscode/
+.workbuddy/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志与本地环境
+*.log
+.env
+.env.*

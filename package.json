@@ -1,0 +1,9 @@
+{
+  "name": "flashmark",
+  "private": true,
+  "description": "FlashMark 根清单：前端工程位于 desktop/，此文件供 Tauri beforeDevCommand / beforeBuildCommand 在项目根执行时转发命令",
+  "scripts": {
+    "dev": "npm --prefix desktop run dev",
+    "build": "npm --prefix desktop run build"
+  }
+}
