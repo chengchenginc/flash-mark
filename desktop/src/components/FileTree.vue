@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/app'
 import { useTabsStore } from '@/stores/tabs'
 import { useRecentsStore } from '@/stores/recents'
 import { invoke } from '@tauri-apps/api/core'
+import { isSupportedFile } from '@/lib/fileKind'
 import type { DirNode } from '@/types'
 import TreeNode from './TreeNode.vue'
 
@@ -25,14 +26,10 @@ async function load() {
 }
 watch(folderPath, () => void load(), { immediate: true })
 
-function isMd(name: string): boolean {
-  return /\.md$/i.test(name)
-}
-
 function visible(node: DirNode): boolean {
   if (app.showAllFiles) return true
   if (node.is_dir) return true
-  return isMd(node.name)
+  return isSupportedFile(node.name)
 }
 
 function toggle(path: string) {
@@ -47,7 +44,7 @@ function openFile(node: DirNode) {
     toggle(node.path)
     return
   }
-  if (!isMd(node.name)) return
+  if (!isSupportedFile(node.name)) return
   invoke<{ path: string; name: string; content: string; size: number }>('open_file', {
     path: node.path,
   })

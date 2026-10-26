@@ -1,4 +1,5 @@
 use crate::db;
+use encoding_rs::{GBK, UTF_16BE, UTF_16LE};
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
@@ -20,11 +21,30 @@ pub struct DirNode {
     pub children: Vec<DirNode>,
 }
 
-/// 打开文件，返回路径、文件名、内容与大小
+/// 将任意编码的文件字节解码为 UTF-8 文本：
+/// 有 BOM 时按 BOM 识别（UTF-16 LE / UTF-16 BE，encoding_rs 解码时会剥离 BOM）；
+/// 无 BOM 时先按 UTF-8 严格解码，失败则回退 GBK（Windows 中文环境常见编码）。
+fn decode_text(bytes: &[u8]) -> String {
+    if bytes.starts_with(&[0xFF, 0xFE]) {
+        return UTF_16LE.decode(bytes).0.into_owned();
+    }
+    if bytes.starts_with(&[0xFE, 0xFF]) {
+        return UTF_16BE.decode(bytes).0.into_owned();
+    }
+    match String::from_utf8(bytes.to_vec()) {
+        Ok(s) => s,
+        Err(_) => GBK.decode(bytes).0.into_owned(),
+    }
+}
+
+/// 打开文件，返回路径、文件名、内容与大小。
+/// 内容按 BOM / UTF-8 / GBK 顺序自动识别解码，避免非 UTF-8 文件（如记事本另存的
+/// UTF-16「Unicode」文件）导致读取失败。
 #[tauri::command]
 pub fn open_file(path: String) -> Result<FileContent, String> {
     let meta = fs::metadata(&path).map_err(|e| e.to_string())?;
-    let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let bytes = fs::read(&path).map_err(|e| e.to_string())?;
+    let content = decode_text(&bytes);
     let name = Path::new(&path)
         .file_name()
         .map(|s| s.to_string_lossy().to_string())

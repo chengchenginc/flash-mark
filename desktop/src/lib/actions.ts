@@ -10,6 +10,7 @@ import { useAppStore } from '@/stores/app'
 import { useTabsStore } from '@/stores/tabs'
 import { useRecentsStore } from '@/stores/recents'
 import { exportPng, exportHtml, exportPdf, buildStandaloneHtml } from '@/lib/exporter'
+import { isSupportedFile } from '@/lib/fileKind'
 
 /** 新建空白文档标签 */
 export async function newFile(): Promise<void> {
@@ -17,10 +18,13 @@ export async function newFile(): Promise<void> {
   tabs.open({ name: '未命名.md', content: '# 未命名\n\n开始写作…' })
 }
 
-/** 系统对话框选择并打开单个 Markdown 文件 */
+/** 系统对话框选择并打开单个文件（Markdown 或 html/csv/txt/js/css 等文本文件） */
 export async function openFile(): Promise<void> {
   const selected = await open({
-    filters: [{ name: 'Markdown', extensions: ['md', 'markdown'] }],
+    filters: [
+      { name: 'Markdown', extensions: ['md', 'markdown'] },
+      { name: 'Text / Web', extensions: ['html', 'htm', 'csv', 'txt', 'js', 'css'] },
+    ],
   })
   if (typeof selected === 'string') await loadFile(selected)
 }
@@ -36,14 +40,23 @@ export async function openFolder(): Promise<void> {
   }
 }
 
-/** 通过后端命令读取文件并打开为新标签，写入最近文件 */
+/** 通过后端命令读取文件并打开为新标签，写入最近文件；失败或不支持的类型时给出 toast 提示 */
 export async function loadFile(path: string): Promise<void> {
+  const app = useAppStore()
+  const name = path.split(/[\\/]/).pop() || path
+  if (!isSupportedFile(name)) {
+    app.showToast('暂不支持打开该类型文件')
+    return
+  }
   const tabs = useTabsStore()
   const recents = useRecentsStore()
   const fc = await invoke<{ path: string; name: string; content: string; size: number }>(
     'open_file',
     { path },
-  ).catch(() => null)
+  ).catch((e) => {
+    app.showToast(`打开失败：${e}`)
+    return null
+  })
   if (!fc) return
   tabs.open({ path: fc.path, name: fc.name, content: fc.content })
   await recents.add(fc.path, fc.name, fc.size)
@@ -57,7 +70,12 @@ export async function saveActive(): Promise<void> {
   if (!t) return
   let path = t.path
   if (!path) {
-    const p = await save({ filters: [{ name: 'Markdown', extensions: ['md'] }] })
+    const p = await save({
+      filters: [
+        { name: 'Markdown', extensions: ['md'] },
+        { name: 'Text / Web', extensions: ['html', 'htm', 'csv', 'txt', 'js', 'css'] },
+      ],
+    })
     if (typeof p !== 'string') return
     path = p
   }

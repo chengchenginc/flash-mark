@@ -110,6 +110,7 @@ Markdown → HTML 由 `markdown-it` 完成，挂载插件：
 ## 7. 拖放与目录树
 
 - 窗口启用 `dragDropEnabled`，前端监听 `getCurrentWebview().onDragDropEvent`。
-- 拖入单 `.md` 文件 → 直接打开为新标签。
-- 拖入文件夹（或含目录的路径数组）→ 调 `read_dir_tree` 递归读取 → 左侧 `FileTree` 渲染（默认仅 Markdown，可切换显示全部）。
+- 拖入单个支持文件（Markdown / Web / 数据配置 / 常见编程脚本语言，完整白名单见 `docs/design-open-nonmd.md`）→ 直接打开为新标签，其他类型 toast 拒绝。
+- 拖入文件夹（或含目录的路径数组）→ 调 `read_dir_tree` 递归读取 → 左侧 `FileTree` 渲染（默认仅显示支持类型，可切换显示全部）。
 - 树节点点击 → 打开对应文件标签 + 写入最近文件。
+- 非 md 类型的预览分支见 `docs/design-open-nonmd.md`（html → 沙箱 iframe，csv → 表格，txt/js/css → 代码高亮）。

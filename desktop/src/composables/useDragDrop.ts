@@ -1,8 +1,7 @@
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { invoke } from '@tauri-apps/api/core'
-import { useTabsStore } from '@/stores/tabs'
 import { useAppStore } from '@/stores/app'
-import { useRecentsStore } from '@/stores/recents'
+import { loadFile } from '@/lib/actions'
 import type { DirNode } from '@/types'
 
 /**
@@ -23,8 +22,6 @@ export async function setupDragDrop(): Promise<() => void> {
 
 async function handleDrop(paths: string[]): Promise<void> {
   const app = useAppStore()
-  const tabs = useTabsStore()
-  const recents = useRecentsStore()
   const first = paths[0]
   const node = await invoke<DirNode>('read_dir_tree', { path: first }).catch(() => null)
   if (node && node.is_dir) {
@@ -32,12 +29,5 @@ async function handleDrop(paths: string[]): Promise<void> {
     app.setSidebarTab('files')
     return
   }
-  const fc = await invoke<{ path: string; name: string; content: string; size: number }>(
-    'open_file',
-    { path: first },
-  ).catch(() => null)
-  if (fc) {
-    tabs.open({ path: fc.path, name: fc.name, content: fc.content })
-    await recents.add(fc.path, fc.name, fc.size)
-  }
+  await loadFile(first)
 }

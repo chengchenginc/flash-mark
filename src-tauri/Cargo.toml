@@ -27,6 +27,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
 base64 = "0.22"
+encoding_rs = "0.8"
 
 # 体积优化：在保持功能的前提下尽量压小 release 产物
 [profile.release]
